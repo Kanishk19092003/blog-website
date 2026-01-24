@@ -2,7 +2,17 @@ const express = require('express');
 const router  = express.Router();
 
 router.get('/',(req,res)=>{
-    res.send("Hello bhai");
+    const locals = {
+        title: "Nodejs Blog",
+        description: "Simple blog created using node express and mongodb"
+    }
+    
+    res.render('index',{locals});
 });
+
+router.get('/about',(req,res)=>{
+    res.render('about ');
+});
+
 
 module.exports = router;
