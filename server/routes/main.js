@@ -1,39 +1,38 @@
-const express = require('express');
-const router  = express.Router();
-const Post = require('../models/Post');
-const { parse } = require('dotenv');
-
+const express = require("express");
+const router = express.Router();
+const Post = require("../models/Post");
+const { parse } = require("dotenv");
 
 //GET HOME WITH PAGINATION //
 
-router.get('/',async(req,res)=>{
-    try {
-        const locals = {
-        title: "Nodejs Blog",
-        description: "Simple blog created using node express and mongodb"
-    }
+router.get("/", async (req, res) => {
+  try {
+    const locals = {
+      title: "Nodejs Blog",
+      description: "Simple blog created using node express and mongodb",
+    };
 
     let perPage = 5;
     let page = req.query.page || 1;
 
-    const data = await Post.aggregate([{$sort: {createdAt: -1} } ])
-    .skip(perPage * page - perPage)
-    .limit(perPage)
-    .exec()
+    const data = await Post.aggregate([{ $sort: { createdAt: -1 } }])
+      .skip(perPage * page - perPage)
+      .limit(perPage)
+      .exec();
 
     const count = await Post.countDocuments();
     const nextPage = parseInt(page) + 1;
-    const hasNextPage = nextPage <= Math.ceil(count/perPage);
+    const hasNextPage = nextPage <= Math.ceil(count / perPage);
 
-        res.render('index',{
-            locals,
-            data,
-            current : page,
-            nextPage: hasNextPage ? nextPage : null
-        });
-    } catch (error) {
-        console.log(error);
-    }
+    res.render("index", {
+      locals,
+      data,
+      current: page,
+      nextPage: hasNextPage ? nextPage : null,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 //GET HOME //
@@ -42,7 +41,7 @@ router.get('/',async(req,res)=>{
 //         title: "Nodejs Blog",
 //         description: "Simple blog created using node express and mongodb"
 //     }
-    
+
 //     try {
 //         const data = await Post.find();
 //         res.render('index',{locals,data});
@@ -51,13 +50,27 @@ router.get('/',async(req,res)=>{
 //     }
 // });
 
-router.get('/about',(req,res)=>{
-    res.render('about');
+//GET Pos:id //
+router.get("/post/:id", async (req, res) => {
+  try {
+    let slug = req.params.id;
+
+    const data = await Post.findById({ _id: slug });
+    const locals = {
+      title: data.title,
+      description: "Simple blog created using node express and mongodb",
+    };
+    res.render("post", { locals, data });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
+router.get("/about", (req, res) => {
+  res.render("about");
+});
 
 module.exports = router;
-
 
 // function insertPostData () {
 //   Post.insertMany([
