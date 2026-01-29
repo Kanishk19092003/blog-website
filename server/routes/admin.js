@@ -39,21 +39,6 @@ router.get('/admin',(req,res)=>{
 });
 
 //POST Admin - check login//
-router.post('/admin',async (req,res)=>{
-    try {
-        const {username,password} = req.body;
-        if(req.body.username === 'admin' && req.body.password === 'admin'){
-            res.send('You are logged in');
-        }else{
-            res.send('Wrong username or password');
-        }
-    } catch (error) {
-        console.log(error);
-    }
-})
-
-
-//POST Admin - check login//
 router.post('/admin', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -80,9 +65,28 @@ router.post('/admin', async (req, res) => {
 });
 
 // GET - ADMIN - dashboard//
-router.get('/dashboard',authMiddleware,async(req,res)=>{
-    res.render('admin/dashboard');
-})
+router.get('/dashboard', authMiddleware, async (req, res) => {
+  try {
+    const locals = {
+      title: 'Dashboard',
+      description: 'Simple Blog created with NodeJs, Express & MongoDb.'
+    }
+
+    const data = await Post.find();
+    res.render('admin/dashboard', {
+      locals,
+      data,
+      layout: adminLayout
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+
+});
+
+
+//GET admin - create new post 
 
 
 //POST Admin - register//
@@ -99,6 +103,84 @@ router.get('/dashboard',authMiddleware,async(req,res)=>{
 //         res.status(409).json({ message: 'User already in use'});
 //       }
 //       res.status(500).json({ message: 'Internal server error'})
+//     }
+
+//   } catch (error) {
+//     console.log(error);
+//   }
+// });
+
+// POST / Admin - Register//
+router.post('/register', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    try {
+      const user = await User.create({ username, password:hashedPassword });
+      res.status(201).json({ message: 'User Created', user });
+    } catch (error) {
+      if(error.code === 11000) {
+        res.status(409).json({ message: 'User already in use'});
+      }
+      res.status(500).json({ message: 'Internal server error'})
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+//GET CREATE NEW POST//
+router.get('/add-post', authMiddleware, async (req, res) => {
+  try {
+    const locals = {
+      title: 'Add Post',
+      description: 'Simple Blog created with NodeJs, Express & MongoDb.'
+    }
+
+    const data = await Post.find();
+    res.render('admin/add-post', {
+      locals,
+      layout: adminLayout
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+
+});
+
+//POST CREATED NEW POST//
+router.post('/add-post', authMiddleware, async (req, res) => {
+  try {
+    try {
+      const newPost = new Post({
+        title: req.body.title,
+        body: req.body.body
+      });
+
+      await Post.create(newPost);
+      res.redirect('/dashboard');
+    } catch (error) {
+      console.log(error);
+    }
+
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+
+
+// router.post('/admin', async (req, res) => {
+//   try {
+//     const { username, password } = req.body;
+    
+//     if(req.body.username === 'admin' && req.body.password === 'password') {
+//       res.send('You are logged in.')
+//     } else {
+//       res.send('Wrong username or password');
 //     }
 
 //   } catch (error) {
