@@ -23,6 +23,7 @@ app.set("view engine", "ejs");
 app.set('layout','./layouts/main');
 
 app.use('/',require('./server/routes/main'));
+app.use('/',require('./server/routes/admin'));
 
 app.listen(PORT,()=>{
     console.log(`App running on port: ${PORT}`);
