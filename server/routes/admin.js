@@ -161,7 +161,7 @@ router.get('/edit-post/:id', authMiddleware, async (req, res) => {
     };
 
     const data = await Post.find({_id: req.params.id});
-    
+
     res.render('/edit-post/',{
       locals,
       data,
@@ -211,6 +211,16 @@ router.post('/add-post', authMiddleware, async (req, res) => {
   }
 });
 
+// DELETE ADMIN POST//
+router.post('/delete-post/:_id', authMiddleware, async (req, res) => {
+  try {
+    await Post.deleteOne({_id:req.params.id});
+    res.redirect('/dashboard');
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 // router.post('/admin', async (req, res) => {
 //   try {
 //     const { username, password } = req.body;
@@ -226,5 +236,11 @@ router.post('/add-post', authMiddleware, async (req, res) => {
 //   }
 // });
 
+//GET ADMIN LOGOUT//
+router.get('/logout',(req,res)=>{
+  res.clearCookie('token');
+  // res.json({message: 'Logout successful'});
+  res.redirect('/');
+})
 
 module.exports= router;
