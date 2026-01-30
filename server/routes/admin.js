@@ -151,6 +151,46 @@ router.get('/add-post', authMiddleware, async (req, res) => {
 
 });
 
+//GET ADMIN CREATE NEW POST//
+router.get('/edit-post/:id', authMiddleware, async (req, res) => {
+  try {
+    
+    const locals = {
+      title: "Edit Post",
+      description: "Free Nodejs User management System",
+    };
+
+    const data = await Post.find({_id: req.params.id});
+    
+    res.render('/edit-post/',{
+      locals,
+      data,
+      layout:adminLayout
+    })
+
+  } catch (error) {
+    console.log(error);
+  }
+
+});
+
+//PUT ADMIN CREATE NEW POST//
+router.put('/edit-post/:id', authMiddleware, async (req, res) => {
+  try {
+    
+    await Post.findByIdAndUpdate(req.params.id,{
+      title: req.body.title,
+      body: req.body.body,
+      updatedAt: Date.now()
+    })
+    res.redirect(`/edit-post/${req.params.id}`)
+
+  } catch (error) {
+    console.log(error);
+  }
+
+});
+
 //POST CREATED NEW POST//
 router.post('/add-post', authMiddleware, async (req, res) => {
   try {
@@ -170,8 +210,6 @@ router.post('/add-post', authMiddleware, async (req, res) => {
     console.log(error);
   }
 });
-
-
 
 // router.post('/admin', async (req, res) => {
 //   try {
